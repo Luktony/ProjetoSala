@@ -1,0 +1,35 @@
+services:
+  postgres:
+    container_name: sala-pg
+    image: bitnami/postgresql
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: docker
+      POSTGRES_PASSWORD: docker
+      POSTGRES_DB: sala-db
+    networks:
+      - sala-project
+
+  sala-app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3377:3377"
+    env_file:
+      - .env
+    volumes:
+      - .:/usr/src/app  # Monta o código-fonte
+      - node_modules:/usr/src/app/node_modules  # Usa volume nomeado para node_modules
+    networks:
+      - sala-project
+    depends_on:
+      - postgres
+
+volumes:
+  node_modules:
+
+networks:
+  sala-project:
+    driver: bridge
